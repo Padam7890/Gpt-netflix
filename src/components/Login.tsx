@@ -20,8 +20,8 @@ const LoginNew = () => {
             name="email"
             type="text"
             placeholder=" "
-            className=" peer p-4 w-full bg-gray-800 text-white rounded-md focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-          />
+            className="peer p-4 w-full bg-gray-900 bg-opacity-40 border border-gray-700 text-white rounded-md 
+            focus:outline-none focus:border-white focus:ring-2 focus:ring-white"          />
           <label
             htmlFor="email"
             className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:top-3 peer-focus:-translate-y-2 peer-focus:scale-90"
@@ -37,8 +37,8 @@ const LoginNew = () => {
             name="password"
             type="password"
             placeholder=" "
-            className="peer p-4 w-full bg-gray-800 text-white rounded-md focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-          />
+            className="peer p-4 w-full bg-gray-900 bg-opacity-40 border border-gray-700 text-white rounded-md 
+            focus:outline-none focus:border-white focus:ring-2 focus:ring-white"           />
           <label
             htmlFor="password"
             className="absolute  left-4 top-5 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-2 peer-focus:scale-90"
