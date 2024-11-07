@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const LoginNew = () => {
+  const [signInForm, setSignInForm] = useState(true);
+
+  const toogleSignInForm = () => {
+    setSignInForm(!signInForm);
+  };
+
   return (
     <div className="relative h-screen w-screen flex items-center justify-center bg-black">
       <div className="absolute h-full w-full">
@@ -11,7 +18,30 @@ const LoginNew = () => {
         />
       </div>
       <form className="relative p-12 bg-black bg-opacity-80 w-full max-w-md text-white rounded-lg">
-        <h1 className="font-bold text-3xl py-4">Sign In</h1>
+        <h1 className="font-bold text-3xl py-4">
+          {signInForm ? "Sign In" : "Sign Up"}
+        </h1>
+
+        {/* User Name Input */}
+
+        {!signInForm && (
+          <div className="relative mb-6">
+            <input
+              id="username"
+              name="text"
+              type="text"
+              placeholder=" "
+              className="peer p-4 w-full bg-gray-900 bg-opacity-40 border border-gray-700 text-white rounded-md 
+            focus:outline-none focus:border-white focus:ring-2 focus:ring-white"
+            />
+            <label
+              htmlFor="username"
+              className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:top-3 peer-focus:-translate-y-2 peer-focus:scale-90"
+            >
+              User Name
+            </label>
+          </div>
+        )}
 
         {/* Email Input */}
         <div className="relative mb-6">
@@ -21,7 +51,8 @@ const LoginNew = () => {
             type="text"
             placeholder=" "
             className="peer p-4 w-full bg-gray-900 bg-opacity-40 border border-gray-700 text-white rounded-md 
-            focus:outline-none focus:border-white focus:ring-2 focus:ring-white"          />
+            focus:outline-none focus:border-white focus:ring-2 focus:ring-white"
+          />
           <label
             htmlFor="email"
             className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:top-3 peer-focus:-translate-y-2 peer-focus:scale-90"
@@ -38,7 +69,8 @@ const LoginNew = () => {
             type="password"
             placeholder=" "
             className="peer p-4 w-full bg-gray-900 bg-opacity-40 border border-gray-700 text-white rounded-md 
-            focus:outline-none focus:border-white focus:ring-2 focus:ring-white"           />
+            focus:outline-none focus:border-white focus:ring-2 focus:ring-white"
+          />
           <label
             htmlFor="password"
             className="absolute  left-4 top-5 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-2 peer-focus:scale-90"
@@ -57,7 +89,14 @@ const LoginNew = () => {
 
         {/* Sign-Up Link */}
         <p className="py-4 text-center">
-          New to Netflix? <a href="#" className="text-blue-500 hover:underline">Sign Up Now</a>
+          {signInForm ? "Don't have an account?" : "Already have an account?"}{" "}
+          <Link
+            onClick={toogleSignInForm}
+            to="#"
+            className="text-blue-500 hover:underline"
+          >
+            {signInForm ? "Sign Up Now" : "Sign In Now"}
+          </Link>
         </p>
       </form>
     </div>
