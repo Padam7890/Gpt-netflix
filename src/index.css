@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.filled + label {
+    top: 2px; 
+    transform: scale(0.9); 
+    color: white;
+  }
+  
