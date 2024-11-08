@@ -1,8 +1,20 @@
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { checkvalidateInput } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+  UserCredential,
+} from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../utils/firebase";
+import { errorHandler } from "../utils/errorhandler";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
 
 const LoginNew = () => {
+  const app = initializeApp(firebaseConfig);
+
   const [signInForm, setSignInForm] = useState(true);
   const [errorMessage, setErrormessage] = useState<string | null>(null);
 
@@ -20,9 +32,52 @@ const LoginNew = () => {
     });
 
     setErrormessage(checkValidate);
-
     if (!checkValidate) {
-      console.log("Form submitted successfully!");
+      const auth = getAuth();
+      const db = getFirestore();
+
+      if (!signInForm) {
+        createUserWithEmailAndPassword(
+          auth,
+          emailRef?.current?.value || "",
+          passwordRef?.current?.value || ""
+        )
+          .then((userCredential) => {
+            const user = userCredential.user;
+
+            // Add user document to Firestore
+            return setDoc(doc(db, "users", user.uid), {
+              displayName: usernameRef?.current?.value || "",
+            });
+          })
+          .then((userCredential) => {
+            console.log(userCredential);
+            alert("User created successfully!");
+          })
+          .catch((error) => {
+            const showError = errorHandler(error);
+            setErrormessage(showError);
+            console.error(error);
+          });
+      } else {
+        //sign in with email and password
+        signInWithEmailAndPassword(
+          auth,
+          emailRef?.current?.value as string,
+          passwordRef?.current?.value as string
+        )
+          .then(async (userCredential: UserCredential) => {
+            console.log(userCredential);
+            const token = await userCredential.user.getIdToken();
+            console.log(token);
+            alert("User signed in successfully!");
+          })
+          .catch((error) => {
+            const showerror = errorHandler(error);
+            setErrormessage(showerror);
+            console.log(error);
+          });
+      }
     }
   };
 

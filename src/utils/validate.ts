@@ -6,15 +6,13 @@ interface checkValidate {
 
 export function checkvalidateInput(input: checkValidate) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   const usernameRegex = /^[a-zA-Z0-9_-]{3,16}$/;
 
   if (!input?.email?.match(emailRegex)) {
     return "Please enter a valid email address";
   }
 
-  if (!input?.password?.match(passwordRegex)) {
+  if (!input?.password) {
     return "Please enter a valid password";
   }
 
