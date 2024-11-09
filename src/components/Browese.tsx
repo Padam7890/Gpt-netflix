@@ -1,8 +1,15 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 
 const Browese = () => {
+
+
+
   return (
-    <div>Browese</div>
+    <div>
+    
+
+    </div>
   )
 }
 

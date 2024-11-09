@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { checkvalidateInput } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   UserCredential,
 } from "firebase/auth";
@@ -11,9 +12,16 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../utils/firebase";
 import { errorHandler } from "../utils/errorhandler";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
+import { useDispatch } from "react-redux";
+import { addUser, removeUser } from "../redux/slices/user";
+// Initialize Firebase outside the component
 
 const LoginNew = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+
 
   const [signInForm, setSignInForm] = useState(true);
   const [errorMessage, setErrormessage] = useState<string | null>(null);
@@ -33,7 +41,6 @@ const LoginNew = () => {
 
     setErrormessage(checkValidate);
     if (!checkValidate) {
-      const auth = getAuth();
       const db = getFirestore();
 
       if (!signInForm) {
@@ -44,38 +51,30 @@ const LoginNew = () => {
         )
           .then((userCredential) => {
             const user = userCredential.user;
-
-            // Add user document to Firestore
-            return setDoc(doc(db, "users", user.uid), {
+             setDoc(doc(db, "users", user.uid), {
               displayName: usernameRef?.current?.value || "",
             });
-          })
-          .then((userCredential) => {
-            console.log(userCredential);
-            alert("User created successfully!");
+            navigate("/browse")
           })
           .catch((error) => {
             const showError = errorHandler(error);
             setErrormessage(showError);
-            console.error(error);
           });
       } else {
-        //sign in with email and password
         signInWithEmailAndPassword(
           auth,
-          emailRef?.current?.value as string,
-          passwordRef?.current?.value as string
+          emailRef?.current?.value || "",
+          passwordRef?.current?.value || ""
         )
           .then(async (userCredential: UserCredential) => {
-            console.log(userCredential);
             const token = await userCredential.user.getIdToken();
             console.log(token);
-            alert("User signed in successfully!");
+            navigate("/browse")
+
           })
           .catch((error) => {
             const showerror = errorHandler(error);
             setErrormessage(showerror);
-            console.log(error);
           });
       }
     }
@@ -84,7 +83,6 @@ const LoginNew = () => {
   const toggleSignInForm = () => {
     setSignInForm(!signInForm);
   };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
       e.target.classList.add("filled");
@@ -92,6 +90,7 @@ const LoginNew = () => {
       e.target.classList.remove("filled");
     }
   };
+
 
   return (
     <div className="relative h-screen w-screen flex items-center justify-center bg-black">
