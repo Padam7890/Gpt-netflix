@@ -4,101 +4,84 @@ import { checkvalidateInput } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
   getAuth,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   updateProfile,
-  UserCredential,
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../utils/firebase";
 import { errorHandler } from "../utils/errorhandler";
-import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { addUser, removeUser } from "../redux/slices/user";
 import Header from "./Header";
+import { getFirestore } from "firebase/firestore";
+
 // Initialize Firebase outside the component
+initializeApp(firebaseConfig);
 
 const LoginNew = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const app = initializeApp(firebaseConfig);
   const auth = getAuth();
 
   const [signInForm, setSignInForm] = useState(true);
-  const [errorMessage, setErrormessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.ChangeEvent<any>) => {
+  const handleSubmit = async (e: React.ChangeEvent<any>) => {
     e.preventDefault();
+    setErrorMessage(null);
 
-    const checkValidate = checkvalidateInput({
+    const validationError = checkvalidateInput({
       username: !signInForm ? usernameRef?.current?.value : null,
       password: passwordRef?.current?.value,
       email: emailRef?.current?.value,
     });
 
-    setErrormessage(checkValidate);
-    if (!checkValidate) {
-      const db = getFirestore();
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
 
+    try {
       if (!signInForm) {
-        createUserWithEmailAndPassword(
+        const userCredential = await createUserWithEmailAndPassword(
           auth,
           emailRef?.current?.value || "",
           passwordRef?.current?.value || ""
-        )
-          .then((userCredential) => {
-            const user = userCredential.user;
-            updateProfile(user, {
-              displayName: usernameRef?.current?.value,
-            })
-              .then(() => {
-                if (auth.currentUser) {
-                  const { uid, email, displayName } = auth.currentUser;
-                  dispatch(
-                    addUser({
-                      uid: uid,
-                      displayName: displayName,
-                      email: email,
-                    })
-                  );
-                  navigate("/browse");
-                }
-              })
-              .catch((error) => {
-                const showError = errorHandler(error);
-                setErrormessage(showError);
-              });
-          })
-          .catch((error) => {
-            const showError = errorHandler(error);
-            setErrormessage(showError);
-          });
+        );
+        const user = userCredential.user;
+
+        await updateProfile(user, {
+          displayName: usernameRef?.current?.value || "",
+        });
+
+        if (auth.currentUser) {
+          const { uid, email, displayName } = auth.currentUser;
+          dispatch(addUser({ uid, displayName, email }));
+          navigate("/browse");
+        }
       } else {
-        signInWithEmailAndPassword(
+        const userCredential = await signInWithEmailAndPassword(
           auth,
           emailRef?.current?.value || "",
           passwordRef?.current?.value || ""
-        )
-          .then(async (userCredential: UserCredential) => {
-            const token = await userCredential.user.getIdToken();
-            console.log(token);
-            navigate("/browse");
-          })
-          .catch((error) => {
-            const showerror = errorHandler(error);
-            setErrormessage(showerror);
-          });
+        );
+
+        const token = await userCredential.user.getIdToken();
+        console.log("User token:", token);
+        navigate("/browse");
       }
+    } catch (error) {
+      const showError = errorHandler(error);
+      setErrorMessage(showError);
     }
   };
 
-  const toggleSignInForm = () => {
-    setSignInForm(!signInForm);
-  };
+  const toggleSignInForm = () => setSignInForm(!signInForm);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
       e.target.classList.add("filled");
@@ -127,7 +110,6 @@ const LoginNew = () => {
             {signInForm ? "Sign In" : "Sign Up"}
           </h1>
 
-          {/* Username Input */}
           {!signInForm && (
             <div className="relative mb-6">
               <input
@@ -141,14 +123,13 @@ const LoginNew = () => {
               />
               <label
                 htmlFor="username"
-                className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100  peer-focus:scale-90 peer-focus:text-white"
+                className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:scale-90 peer-focus:text-white"
               >
                 Username
               </label>
             </div>
           )}
 
-          {/* Email Input */}
           <div className="relative mb-6">
             <input
               ref={emailRef}
@@ -161,13 +142,12 @@ const LoginNew = () => {
             />
             <label
               htmlFor="email"
-              className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100  peer-focus:scale-90 peer-focus:text-white"
+              className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:scale-90 peer-focus:text-white"
             >
               Email Address
             </label>
           </div>
 
-          {/* Password Input */}
           <div className="relative mb-6">
             <input
               ref={passwordRef}
@@ -180,13 +160,12 @@ const LoginNew = () => {
             />
             <label
               htmlFor="password"
-              className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100  peer-focus:scale-90 peer-focus:text-white"
+              className="absolute left-4 top-4 text-gray-500 text-sm transition-all transform scale-100 pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:scale-100 peer-focus:scale-90 peer-focus:text-white"
             >
               Password
             </label>
           </div>
 
-          {/* Submit Button */}
           <button
             className="p-4 w-full bg-red-700 rounded-lg text-lg font-semibold hover:bg-red-800 transition-colors duration-200"
             type="submit"
@@ -197,7 +176,6 @@ const LoginNew = () => {
             <p className="text-red-500 text-sm mt-4">{errorMessage}</p>
           )}
 
-          {/* Toggle Sign-In/Sign-Up Link */}
           <p className="py-4 text-center">
             {signInForm ? "Don't have an account?" : "Already have an account?"}{" "}
             <Link

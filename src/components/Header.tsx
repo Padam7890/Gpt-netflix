@@ -6,7 +6,6 @@ import { removeUser } from "../redux/slices/user";
 
 const Header = () => {
   const user = useSelector((store: any) => store.users);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSignOut = () => {
