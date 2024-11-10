@@ -56,7 +56,17 @@ const LoginNew = () => {
               displayName: usernameRef?.current?.value,
             })
               .then(() => {
-                navigate("/browse");
+                if (auth.currentUser) {
+                  const { uid, email, displayName } = auth.currentUser;
+                  dispatch(
+                    addUser({
+                      uid: uid,
+                      displayName: displayName,
+                      email: email,
+                    })
+                  );
+                  navigate("/browse");
+                }
               })
               .catch((error) => {
                 const showError = errorHandler(error);
