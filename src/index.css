@@ -7,4 +7,23 @@
     transform: scale(0.9); 
     color: white;
   }
-  
+  .swiper-button-next , .swiper-button-prev{
+    @apply text-red-800 !important;
+    @apply rounded-md;
+    @apply py-2;
+    @apply px-6;
+    @apply font-medium;
+    @apply hover:bg-blue-600;
+  }
+
+  .swiper-pagination{
+    @apply flex;
+    @apply justify-center;
+    @apply items-center;
+    @apply gap-4;
+    @apply mt-20;
+    @apply rounded-md;
+  }
+  .swiper-wrapper{
+    padding-bottom: 40px;
+  }

@@ -12,7 +12,7 @@ const Header = () => {
   const auth = getAuth();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const { displayName, email, phoneNumber } = user;
         dispatch(
@@ -28,14 +28,16 @@ const Header = () => {
         dispatch(removeUser());
         navigate("/");
       }
+      return () => {
+        unsubscribe();
+      };
     });
   }, []);
 
   const handleSignOut = () => {
     const auth = getAuth();
     signOut(auth)
-      .then(() => {
-      })
+      .then(() => {})
       .catch((error) => {
         console.error("An error occurred while signing out:", error);
       });
